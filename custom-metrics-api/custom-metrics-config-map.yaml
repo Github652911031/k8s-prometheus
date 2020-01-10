@@ -70,6 +70,18 @@ data:
         matches: ^(.*)_seconds_total$
         as: ""
       metricsQuery: sum(rate(<<.Series>>{<<.LabelMatchers>>}[1m])) by (<<.GroupBy>>)
+    - seriesQuery: '{__name__=~"^http_request_.*",kubernetes_pod_name!="",kubernetes_namespace!=""}'
+      seriesFilters: []
+      resources:
+        overrides:
+          kubernetes_namespace:
+            resource: namespace
+          kubernetes_pod_name:
+            resource: pod
+      name:
+        matches: ^(.*)_(total)$
+        as: "${1}"
+      metricsQuery: sum(rate(<<.Series>>{<<.LabelMatchers>>}[1m])) by (<<.GroupBy>>)
     resourceRules:
       cpu:
         containerQuery: sum(rate(container_cpu_usage_seconds_total{<<.LabelMatchers>>}[1m])) by (<<.GroupBy>>)
